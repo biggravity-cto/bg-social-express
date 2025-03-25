@@ -66,6 +66,36 @@
     --input: 0 0% 90%;
     --ring: 217 89% 61%;
   }
+
+  .dark {
+    --background: 220 13% 18%;
+    --foreground: 0 0% 98%;
+
+    --card: 220 13% 23%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 220 13% 23%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 217 89% 61%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 13% 28%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 220 13% 28%;
+    --muted-foreground: 220 13% 65%;
+
+    --accent: 217 89% 61%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 56%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 13% 30%;
+    --input: 220 13% 30%;
+    --ring: 217 89% 61%;
+  }
 }
 
 @layer base {
@@ -79,6 +109,9 @@
     @apply bg-background text-foreground font-sans;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+  .dark {
+    color-scheme: dark;
   }
   h1,
   h2,

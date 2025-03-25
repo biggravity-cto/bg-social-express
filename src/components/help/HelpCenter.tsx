@@ -26,7 +26,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 const HelpCenter = () => {
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-6 space-y-6 bg-background">
         <div>
           <h1 className="text-2xl font-medium gradient-text">Help Center</h1>
           <p className="text-muted-foreground">

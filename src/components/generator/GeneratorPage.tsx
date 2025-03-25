@@ -20,7 +20,7 @@ const GeneratorPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-background">
         <AIGenerator onSaveToCalendar={handleSaveToCalendar} />
 
         <CreatePostDialog

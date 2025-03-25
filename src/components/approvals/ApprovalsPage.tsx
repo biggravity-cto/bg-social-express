@@ -23,7 +23,7 @@ const ApprovalsPage = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-6 space-y-6 bg-background">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <h1 className="text-2xl font-medium gradient-text">
             Approval Workflow

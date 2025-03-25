@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import ThemeToggle from "./ThemeToggle";
 
 interface HeaderProps {
   className?: string;
@@ -39,6 +40,8 @@ const Header = ({ className = "" }: HeaderProps) => {
             className="w-[240px] pl-10 h-10 rounded-full bg-background/50 border-border focus:border-primary"
           />
         </div>
+
+        <ThemeToggle />
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

@@ -10,6 +10,7 @@ import {
   Settings,
   LogOut,
   HelpCircle,
+  Image,
 } from "lucide-react";
 
 interface SidebarItemProps {
@@ -81,6 +82,11 @@ const Sidebar = ({ activePath }: SidebarProps) => {
       icon: <BarChart3 className="w-5 h-5" />,
       label: "Analytics",
       href: "/analytics",
+    },
+    {
+      icon: <Image className="w-5 h-5" />,
+      label: "Asset Library",
+      href: "/assets",
     },
     {
       icon: <Settings className="w-5 h-5" />,

@@ -21,6 +21,7 @@ import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "@/lib/utils";
 import { Link, useLocation } from "react-router-dom";
+import ThemeToggle from "./layout/ThemeToggle";
 
 interface SidebarLinkProps {
   icon: React.ReactNode;
@@ -169,6 +170,7 @@ const Header: React.FC<HeaderProps> = ({ onSearch = () => {} }) => {
         </div>
       </form>
       <div className="flex items-center gap-4">
+        <ThemeToggle />
         <Button
           variant="ghost"
           size="icon"
@@ -225,7 +227,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({
 const Home: React.FC = () => {
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 bg-background">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h1 className="text-2xl font-bold">Dashboard</h1>
           <QuickActions />

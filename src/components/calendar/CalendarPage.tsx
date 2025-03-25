@@ -17,6 +17,12 @@ import {
   Calendar as CalendarIcon,
   Grid,
   List,
+  Copy,
+  Download,
+  Share2,
+  Tag,
+  Filter,
+  Repeat,
 } from "lucide-react";
 import {
   Select,
@@ -25,6 +31,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 interface SavedPost extends PostData {
   id: string;
@@ -127,7 +139,7 @@ const CalendarPage: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-6 space-y-6 bg-background">
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">
@@ -138,11 +150,34 @@ const CalendarPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 mr-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-border hover:bg-accent/10 hover:text-primary"
+              >
+                <Tag className="mr-2 h-4 w-4" /> Categories
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-border hover:bg-accent/10 hover:text-primary"
+              >
+                <Filter className="mr-2 h-4 w-4" /> Filter
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full border-border hover:bg-accent/10 hover:text-primary"
+              >
+                <Repeat className="mr-2 h-4 w-4" /> Recurring
+              </Button>
+            </div>
             <Select
               value={selectedPostType}
               onValueChange={setSelectedPostType}
             >
-              <SelectTrigger className="w-[180px]">
+              <SelectTrigger className="w-[180px] rounded-full">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
@@ -169,7 +204,39 @@ const CalendarPage: React.FC = () => {
                 <List className="h-4 w-4" />
               </Button>
             </div>
-            <Button onClick={handleCreatePost}>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full border-border hover:bg-accent/10 hover:text-primary"
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Share Calendar</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="rounded-full border-border hover:bg-accent/10 hover:text-primary"
+                  >
+                    <Download className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Export Calendar</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            <Button onClick={handleCreatePost} className="rounded-full">
               <Plus className="mr-2 h-4 w-4" /> Create Post
             </Button>
           </div>
@@ -208,7 +275,7 @@ const CalendarPage: React.FC = () => {
                   {savedPosts.map((post) => (
                     <Card
                       key={post.id}
-                      className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                      className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer bg-card border-border"
                       onClick={() => handleUseSavedPost(post)}
                     >
                       <div className="relative">
@@ -238,7 +305,7 @@ const CalendarPage: React.FC = () => {
                   ))}
 
                   <Card
-                    className="border-dashed flex items-center justify-center h-[200px] cursor-pointer hover:bg-accent/5 transition-colors"
+                    className="border-dashed flex items-center justify-center h-[200px] cursor-pointer hover:bg-accent/5 transition-colors bg-card/50 border-border"
                     onClick={handleCreatePost}
                   >
                     <div className="text-center">
