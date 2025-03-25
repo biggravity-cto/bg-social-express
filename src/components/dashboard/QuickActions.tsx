@@ -22,60 +22,58 @@ interface QuickAction {
 
 const QuickActions = ({ actions = defaultActions }: QuickActionProps) => {
   return (
-    <Card className="w-full p-6 bg-white shadow-sm">
-      <h2 className="text-xl font-semibold mb-4">Quick Actions</h2>
-      <div className="flex flex-wrap gap-4">
-        {actions.map((action, index) => (
-          <TooltipProvider key={index}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="flex flex-col items-center justify-center h-24 w-32 p-2 border-2 hover:bg-slate-50 transition-colors"
-                  onClick={action.onClick}
-                >
-                  <div className="text-primary mb-2">{action.icon}</div>
-                  <span className="text-sm font-medium">{action.label}</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>{action.description}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
-      </div>
-    </Card>
+    <div className="flex flex-wrap gap-2">
+      {actions.map((action, index) => (
+        <TooltipProvider key={index}>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="glass"
+                size="sm"
+                className="flex items-center gap-2 h-10 px-4 py-2 shadow-md"
+                onClick={action.onClick}
+              >
+                <div className="text-white">{action.icon}</div>
+                <span className="text-sm font-medium">{action.label}</span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent className="bg-card border-border">
+              <p>{action.description}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ))}
+    </div>
   );
 };
 
 const defaultActions: QuickAction[] = [
   {
-    icon: <PlusCircle size={24} />,
+    icon: <PlusCircle size={20} className="text-google-blue" />,
     label: "Create Post",
     description: "Create a new social media post",
     onClick: () => console.log("Create post clicked"),
   },
   {
-    icon: <Calendar size={24} />,
-    label: "View Calendar",
+    icon: <Calendar size={20} className="text-google-green" />,
+    label: "Calendar",
     description: "Go to content calendar view",
     onClick: () => console.log("View calendar clicked"),
   },
   {
-    icon: <Wand2 size={24} />,
+    icon: <Wand2 size={20} className="text-google-yellow" />,
     label: "AI Generator",
     description: "Generate content with AI",
     onClick: () => console.log("AI generator clicked"),
   },
   {
-    icon: <Clock size={24} />,
+    icon: <Clock size={20} className="text-google-red" />,
     label: "Schedule",
     description: "Schedule posts for later",
     onClick: () => console.log("Schedule clicked"),
   },
   {
-    icon: <FileCheck size={24} />,
+    icon: <FileCheck size={20} className="text-purple-400" />,
     label: "Approvals",
     description: "Review pending approvals",
     onClick: () => console.log("Approvals clicked"),

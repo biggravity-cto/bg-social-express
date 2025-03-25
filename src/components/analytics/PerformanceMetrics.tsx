@@ -17,16 +17,16 @@ const PerformanceMetrics = () => {
   ];
 
   return (
-    <Card className="w-full bg-white">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg font-semibold">
+    <Card className="w-full bg-card shadow-md rounded-lg border-0">
+      <CardHeader className="flex flex-row items-center justify-between pb-2 border-b border-border">
+        <CardTitle className="text-lg font-medium gradient-text">
           Platform Performance
         </CardTitle>
         <Select defaultValue="all">
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-[150px] border-border rounded-full text-foreground bg-background/50">
             <SelectValue placeholder="Select platform" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="rounded-lg border-border shadow-md bg-card">
             <SelectItem value="all">All Platforms</SelectItem>
             <SelectItem value="instagram">Instagram</SelectItem>
             <SelectItem value="facebook">Facebook</SelectItem>
@@ -38,33 +38,44 @@ const PerformanceMetrics = () => {
       <CardContent>
         <div className="space-y-4">
           {/* Chart placeholder - in a real app, use a chart library */}
-          <div className="h-64 w-full bg-slate-100 rounded-md flex items-center justify-center">
+          <div className="h-64 w-full bg-background rounded-lg flex items-center justify-center mt-4">
             <p className="text-muted-foreground">Performance Chart</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
             {platformData.map((data) => (
-              <div key={data.platform} className="p-4 border rounded-md">
-                <div className="flex items-center mb-2">
-                  <div className="w-6 h-6 mr-2">
-                    {data.platform === "Instagram" && "📸"}
-                    {data.platform === "Facebook" && "👍"}
-                    {data.platform === "Twitter" && "🐦"}
+              <div
+                key={data.platform}
+                className="p-4 border border-border rounded-lg bg-card/50 shadow-md hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center mb-3">
+                  <div className="w-8 h-8 mr-3 flex items-center justify-center bg-accent/10 rounded-full">
+                    {data.platform === "Instagram" && (
+                      <span className="text-pink-400">📸</span>
+                    )}
+                    {data.platform === "Facebook" && (
+                      <span className="text-blue-400">👍</span>
+                    )}
+                    {data.platform === "Twitter" && (
+                      <span className="text-sky-400">🐦</span>
+                    )}
                   </div>
-                  <h3 className="font-medium">{data.platform}</h3>
+                  <h3 className="font-medium text-foreground">
+                    {data.platform}
+                  </h3>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">
                       Engagement
                     </span>
-                    <span className="font-medium">
+                    <span className="font-medium text-foreground">
                       {data.engagement.toLocaleString()}
                     </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-muted-foreground">Reach</span>
-                    <span className="font-medium">
+                    <span className="font-medium text-foreground">
                       {data.reach.toLocaleString()}
                     </span>
                   </div>
@@ -72,7 +83,7 @@ const PerformanceMetrics = () => {
                     <span className="text-sm text-muted-foreground">
                       New Followers
                     </span>
-                    <span className="font-medium">
+                    <span className="font-medium text-foreground">
                       {data.followers.toLocaleString()}
                     </span>
                   </div>

@@ -75,6 +75,22 @@ const templates: Template[] = [
       "Create a social media post about a local attraction near our hotel. Attraction details: {{attractionDetails}}",
     category: "local",
   },
+  {
+    id: "seasonal-special",
+    name: "Seasonal Special",
+    description: "Promote seasonal offerings or holiday specials",
+    prompt:
+      "Create a social media post about our seasonal or holiday special. Details: {{seasonalDetails}}",
+    category: "promotion",
+  },
+  {
+    id: "guest-testimonial",
+    name: "Guest Testimonial",
+    description: "Share a positive guest experience or review",
+    prompt:
+      "Create a social media post highlighting a guest testimonial. Review details: {{testimonialDetails}}",
+    category: "social-proof",
+  },
 ];
 
 const AIGenerator: React.FC<AIGeneratorProps> = ({
@@ -104,37 +120,78 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
     // Simulate AI generation with a timeout
     setTimeout(() => {
       let content = "";
+      let hashtags = [];
 
       switch (selectedTemplate.id) {
         case "promo-event":
-          content =
-            language === "korean"
-              ? `🎉 특별 이벤트 알림! 🎉\n\n${promptDetails}\n\n지금 바로 예약하세요! 링크는 프로필에 있습니다. #호텔이벤트 #특별행사`
-              : `🎉 EVENT ALERT! 🎉\n\nJoin us for ${promptDetails}\n\nBook your spot now! Link in bio. #HotelEvents #SpecialOccasions`;
+          if (language === "korean") {
+            content = `🎉 특별 이벤트 알림! 🎉\n\n${promptDetails}\n\n지금 바로 예약하세요! 링크는 프로필에 있습니다. #호텔이벤트 #특별행사 #럭셔리호텔 #주말여행`;
+            hashtags = ["호텔이벤트", "특별행사", "럭셔리호텔", "주말여행"];
+          } else {
+            content = `🎉 EVENT ALERT! 🎉\n\nJoin us for ${promptDetails}\n\nBook your spot now! Link in bio. #HotelEvents #SpecialOccasions #LuxuryHotel #WeekendGetaway`;
+            hashtags = [
+              "HotelEvents",
+              "SpecialOccasions",
+              "LuxuryHotel",
+              "WeekendGetaway",
+            ];
+          }
           break;
         case "special-offer":
-          content =
-            language === "korean"
-              ? `💯 특별 할인 혜택! 💯\n\n${promptDetails}\n\n지금 예약하고 특별한 경험을 누리세요! #호텔특가 #할인혜택`
-              : `💯 SPECIAL OFFER ALERT! 💯\n\n${promptDetails}\n\nBook now and enjoy this amazing deal! #HotelDeals #SpecialOffer`;
+          if (language === "korean") {
+            content = `💯 특별 할인 혜택! 💯\n\n${promptDetails}\n\n지금 예약하고 특별한 경험을 누리세요! #호텔특가 #할인혜택 #럭셔리스테이 #호캉스`;
+            hashtags = ["호텔특가", "할인혜택", "럭셔리스테이", "호캉스"];
+          } else {
+            content = `💯 SPECIAL OFFER ALERT! 💯\n\n${promptDetails}\n\nBook now and enjoy this amazing deal! #HotelDeals #SpecialOffer #LuxuryStay #HotelPromotion`;
+            hashtags = [
+              "HotelDeals",
+              "SpecialOffer",
+              "LuxuryStay",
+              "HotelPromotion",
+            ];
+          }
           break;
         case "room-highlight":
-          content =
-            language === "korean"
-              ? `✨ 럭셔리한 객실 소개 ✨\n\n${promptDetails}\n\n지금 예약하고 특별한 경험을 누리세요! #호텔객실 #럭셔리스테이`
-              : `✨ Room Spotlight ✨\n\n${promptDetails}\n\nBook now for an unforgettable stay! #HotelRoom #LuxuryStay`;
+          if (language === "korean") {
+            content = `✨ 럭셔리한 객실 소개 ✨\n\n${promptDetails}\n\n지금 예약하고 특별한 경험을 누리세요! #호텔객실 #럭셔리스테이 #호캉스 #힐링여행`;
+            hashtags = ["호텔객실", "럭셔리스테이", "호캉스", "힐링여행"];
+          } else {
+            content = `✨ Room Spotlight ✨\n\n${promptDetails}\n\nBook now for an unforgettable stay! #HotelRoom #LuxuryStay #RoomWithAView #VacationMode`;
+            hashtags = [
+              "HotelRoom",
+              "LuxuryStay",
+              "RoomWithAView",
+              "VacationMode",
+            ];
+          }
           break;
         case "dining-experience":
-          content =
-            language === "korean"
-              ? `🍽️ 특별한 다이닝 경험 🍽️\n\n${promptDetails}\n\n지금 예약하세요! #호텔다이닝 #맛있는경험`
-              : `🍽️ Culinary Excellence 🍽️\n\n${promptDetails}\n\nReserve your table now! #HotelDining #CulinaryExperience`;
+          if (language === "korean") {
+            content = `🍽️ 특별한 다이닝 경험 🍽️\n\n${promptDetails}\n\n지금 예약하세요! #호텔다이닝 #맛있는경험 #미식가 #셰프스테이블`;
+            hashtags = ["호텔다이닝", "맛있는경험", "미식가", "셰프스테이블"];
+          } else {
+            content = `🍽️ Culinary Excellence 🍽️\n\n${promptDetails}\n\nReserve your table now! #HotelDining #CulinaryExperience #Foodie #ChefsTable`;
+            hashtags = [
+              "HotelDining",
+              "CulinaryExperience",
+              "Foodie",
+              "ChefsTable",
+            ];
+          }
           break;
         case "local-attraction":
-          content =
-            language === "korean"
-              ? `🌟 주변 명소 추천 🌟\n\n${promptDetails}\n\n더 많은 정보는 프론트 데스크에 문의하세요! #여행팁 #현지경험`
-              : `🌟 Local Attraction Spotlight 🌟\n\n${promptDetails}\n\nAsk our front desk for more information! #TravelTips #LocalExperience`;
+          if (language === "korean") {
+            content = `🌟 주변 명소 추천 🌟\n\n${promptDetails}\n\n더 많은 정보는 프론트 데스크에 문의하세요! #여행팁 #현지경험 #여행스타그램 #로컬여행`;
+            hashtags = ["여행팁", "현지경험", "여행스타그램", "로컬여행"];
+          } else {
+            content = `🌟 Local Attraction Spotlight 🌟\n\n${promptDetails}\n\nAsk our front desk for more information! #TravelTips #LocalExperience #TravelGram #ExploreMore`;
+            hashtags = [
+              "TravelTips",
+              "LocalExperience",
+              "TravelGram",
+              "ExploreMore",
+            ];
+          }
           break;
         default:
           content = "Generated content will appear here.";
@@ -144,6 +201,14 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
       if (tone === "casual" && language === "english") {
         content = content.replace("Join us for", "Hey! Come check out");
         content = content.replace("Book your spot now!", "Don't miss out!");
+        content = content.replace(
+          "Reserve your table now!",
+          "Come grab a bite with us!",
+        );
+        content = content.replace(
+          "Ask our front desk for information",
+          "Just ask us for the inside scoop",
+        );
       } else if (tone === "luxury" && language === "english") {
         content = content.replace(
           "Join us for",
@@ -153,14 +218,27 @@ const AIGenerator: React.FC<AIGeneratorProps> = ({
           "Book your spot now!",
           "Secure your exclusive reservation today.",
         );
+        content = content.replace(
+          "Reserve your table now!",
+          "We invite you to reserve your exclusive dining experience.",
+        );
+        content = content.replace(
+          "Ask our front desk for information",
+          "Our concierge team would be delighted to provide personalized recommendations",
+        );
       }
 
       // Adjust for platform
       if (platform === "twitter" && content.length > 280) {
         content = content.substring(0, 277) + "...";
+      } else if (platform === "linkedin") {
+        // More professional tone for LinkedIn
+        content = content.replace(/🎉|💯|✨|🍽️|🌟/g, "");
+        content = content.trim();
       }
 
       setGeneratedContent(content);
+      handleChange("hashtags", hashtags);
       setIsGenerating(false);
     }, 2000);
   };

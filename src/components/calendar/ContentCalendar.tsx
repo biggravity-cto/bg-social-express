@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Card, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
 import {
   Select,
@@ -15,10 +15,23 @@ import {
   addWeeks,
   subWeeks,
   eachDayOfInterval,
+  isSameMonth,
+  startOfMonth,
+  endOfMonth,
+  isSameDay,
+  parseISO,
 } from "date-fns";
-import { ChevronLeft, ChevronRight, Plus, Filter } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  Sparkles,
+  Calendar as CalendarIcon,
+} from "lucide-react";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
+import { Calendar } from "../ui/calendar";
 
 interface Post {
   id: string;
@@ -27,13 +40,7 @@ interface Post {
   status: "draft" | "scheduled" | "published";
   time: string;
   image?: string;
-}
-
-interface CalendarDay {
-  date: Date;
-  posts: Post[];
-  isCurrentMonth: boolean;
-  isToday: boolean;
+  type?: string;
 }
 
 interface ContentCalendarProps {
@@ -41,6 +48,9 @@ interface ContentCalendarProps {
   posts?: Record<string, Post[]>;
   onCreatePost?: () => void;
   onEditPost?: (postId: string) => void;
+  onGenerateByType?: (type: string, date: Date) => void;
+  postType?: string;
+  view?: "grid" | "list";
 }
 
 const platformColors = {
@@ -63,9 +73,19 @@ const platformIcons = {
   linkedin: "💼",
 };
 
+const postTypeIcons = {
+  promotion: "🏷️",
+  event: "🎉",
+  announcement: "📢",
+  menu: "🍽️",
+  holiday: "🎄",
+};
+
 const generateMockPosts = (): Record<string, Post[]> => {
   const today = new Date();
   const posts: Record<string, Post[]> = {};
+
+  const postTypes = ["promotion", "event", "announcement", "menu", "holiday"];
 
   // Generate posts for the next 14 days
   for (let i = 0; i < 14; i++) {
@@ -90,23 +110,38 @@ const generateMockPosts = (): Record<string, Post[]> => {
         const platform =
           platforms[Math.floor(Math.random() * platforms.length)];
         const status = statuses[Math.floor(Math.random() * statuses.length)];
+        const type = postTypes[Math.floor(Math.random() * postTypes.length)];
 
         const hours = Math.floor(Math.random() * 12) + 8; // 8 AM to 8 PM
         const minutes = ["00", "15", "30", "45"][Math.floor(Math.random() * 4)];
         const ampm = hours >= 12 ? "PM" : "AM";
 
+        const titles = {
+          promotion: ["Weekend Special", "Happy Hour Deal", "Limited Offer"],
+          event: ["Live Music Night", "Chef's Table", "Wine Tasting"],
+          announcement: [
+            "New Staff Member",
+            "Renovation Complete",
+            "Extended Hours",
+          ],
+          menu: ["New Menu Item", "Seasonal Specials", "Chef's Recommendation"],
+          holiday: [
+            "Holiday Special",
+            "Christmas Menu",
+            "New Year's Eve Party",
+          ],
+        };
+
+        const titleOptions =
+          titles[type as keyof typeof titles] || titles.promotion;
+
         const post: Post = {
           id: `post-${dateStr}-${j}`,
-          title: [
-            "Weekend Special",
-            "New Menu Item",
-            "Hotel Promotion",
-            "Event Announcement",
-            "Holiday Special",
-          ][Math.floor(Math.random() * 5)],
+          title: titleOptions[Math.floor(Math.random() * titleOptions.length)],
           platform,
           status,
           time: `${hours % 12 || 12}:${minutes} ${ampm}`,
+          type,
         };
 
         // Add image to some posts
@@ -135,26 +170,31 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
   posts = defaultPosts,
   onCreatePost = () => console.log("Create post clicked"),
   onEditPost = (id) => console.log(`Edit post ${id} clicked`),
+  onGenerateByType = (type, date) =>
+    console.log(`Generate ${type} for ${date}`),
+  postType = "all",
+  view = "grid",
 }) => {
   const [currentDate, setCurrentDate] = useState(initialDate);
-  const [view, setView] = useState<"week" | "month">("week");
+  const [calendarView, setCalendarView] = useState<"week" | "month">("week");
   const [platformFilter, setPlatformFilter] = useState<string>("all");
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const startDate = startOfWeek(currentDate, { weekStartsOn: 0 });
 
   const navigatePrevious = () => {
-    if (view === "week") {
+    if (calendarView === "week") {
       setCurrentDate(subWeeks(currentDate, 1));
     } else {
-      // Handle month view navigation
+      setCurrentDate(subWeeks(currentDate, 4));
     }
   };
 
   const navigateNext = () => {
-    if (view === "week") {
+    if (calendarView === "week") {
       setCurrentDate(addWeeks(currentDate, 1));
     } else {
-      // Handle month view navigation
+      setCurrentDate(addWeeks(currentDate, 4));
     }
   };
 
@@ -176,34 +216,293 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
       dayPosts = dayPosts.filter((post) => post.platform === platformFilter);
     }
 
+    // Apply post type filter
+    if (postType !== "all") {
+      dayPosts = dayPosts.filter((post) => post.type === postType);
+    }
+
     return dayPosts;
   };
 
   const isToday = (date: Date) => {
     const today = new Date();
+    return isSameDay(date, today);
+  };
+
+  const handleCreateForDay = (date: Date) => {
+    setSelectedDate(date);
+    onCreatePost();
+  };
+
+  const handleGenerateForDay = (date: Date) => {
+    setSelectedDate(date);
+    // Open a popover with post type options
+  };
+
+  const renderCalendarGrid = () => (
+    <>
+      <div className="grid grid-cols-7 gap-2 md:gap-4">
+        {weekDays.map((day) => (
+          <div key={day.toString()} className="text-center">
+            <div className="font-medium mb-1 text-xs md:text-sm">
+              {format(day, "EEE")}
+            </div>
+            <div
+              className={cn(
+                "rounded-full w-6 h-6 md:w-8 md:h-8 flex items-center justify-center mx-auto text-xs md:text-sm",
+                isToday(day)
+                  ? "bg-primary text-primary-foreground"
+                  : "text-gray-600",
+              )}
+            >
+              {format(day, "d")}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-7 gap-2 md:gap-4">
+        {weekDays.map((day) => {
+          const dayPosts = getPostsForDay(day);
+
+          return (
+            <div
+              key={day.toString()}
+              className={cn(
+                "min-h-[150px] md:min-h-[200px] border rounded-lg p-1 md:p-2 overflow-y-auto",
+                isToday(day)
+                  ? "border-primary/50 bg-primary/5"
+                  : "border-gray-200",
+              )}
+            >
+              {dayPosts.length > 0 ? (
+                <div className="space-y-1 md:space-y-2">
+                  {dayPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="p-1 md:p-2 rounded-md border bg-white cursor-pointer hover:shadow-sm transition-shadow"
+                      onClick={() => onEditPost(post.id)}
+                    >
+                      <div className="flex flex-wrap justify-between items-start gap-1 mb-1">
+                        <Badge
+                          className={`${platformColors[post.platform]} text-xs whitespace-nowrap`}
+                          variant="outline"
+                        >
+                          {platformIcons[post.platform]} {post.platform}
+                        </Badge>
+                        <Badge
+                          className={`${statusColors[post.status]} text-xs whitespace-nowrap`}
+                          variant="outline"
+                        >
+                          {post.status}
+                        </Badge>
+                      </div>
+                      <div className="font-medium text-xs md:text-sm truncate">
+                        {post.title}
+                      </div>
+                      <div className="text-xs text-gray-500">{post.time}</div>
+                      {post.image && (
+                        <div className="mt-1 h-10 md:h-12 rounded overflow-hidden">
+                          <img
+                            src={post.image}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                      {post.type && (
+                        <div className="mt-1 text-xs flex items-center">
+                          <span className="mr-1">
+                            {postTypeIcons[
+                              post.type as keyof typeof postTypeIcons
+                            ] || "📄"}
+                          </span>
+                          <span className="capitalize">{post.type}</span>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center space-y-1 md:space-y-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs text-muted-foreground w-full h-8 px-1"
+                    onClick={() => handleCreateForDay(day)}
+                  >
+                    <Plus className="h-3 w-3 mr-1" /> Add
+                  </Button>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="text-xs text-muted-foreground w-full h-8 px-1"
+                      >
+                        <Sparkles className="h-3 w-3 mr-1" /> Generate
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-2">
+                      <div className="space-y-1">
+                        <p className="text-xs font-medium mb-2">
+                          Generate post for {format(day, "MMM d")}:
+                        </p>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs"
+                          onClick={() => onGenerateByType("promotion", day)}
+                        >
+                          🏷️ Promotion
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs"
+                          onClick={() => onGenerateByType("event", day)}
+                        >
+                          🎉 Event
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs"
+                          onClick={() => onGenerateByType("announcement", day)}
+                        >
+                          📢 Announcement
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs"
+                          onClick={() => onGenerateByType("menu", day)}
+                        >
+                          🍽️ Menu Update
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full justify-start text-xs"
+                          onClick={() => onGenerateByType("holiday", day)}
+                        >
+                          🎄 Holiday
+                        </Button>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+
+  const renderCalendarList = () => {
+    // Flatten all posts and sort by date
+    const allPosts: (Post & { date: Date })[] = [];
+
+    Object.entries(posts).forEach(([dateStr, dayPosts]) => {
+      dayPosts.forEach((post) => {
+        // Apply filters
+        if (
+          (platformFilter === "all" || post.platform === platformFilter) &&
+          (postType === "all" || post.type === postType)
+        ) {
+          allPosts.push({
+            ...post,
+            date: parseISO(dateStr),
+          });
+        }
+      });
+    });
+
+    // Sort by date
+    allPosts.sort((a, b) => a.date.getTime() - b.date.getTime());
+
     return (
-      date.getDate() === today.getDate() &&
-      date.getMonth() === today.getMonth() &&
-      date.getFullYear() === today.getFullYear()
+      <div className="space-y-4">
+        {allPosts.length > 0 ? (
+          allPosts.map((post) => (
+            <Card
+              key={post.id}
+              className="overflow-hidden hover:shadow-sm transition-shadow"
+            >
+              <div className="flex items-start p-4 gap-4">
+                {post.image && (
+                  <div className="h-16 w-16 rounded overflow-hidden flex-shrink-0">
+                    <img
+                      src={post.image}
+                      alt={post.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                )}
+                <div className="flex-1">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="font-medium">{post.title}</div>
+                    <Badge
+                      className={statusColors[post.status]}
+                      variant="outline"
+                    >
+                      {post.status}
+                    </Badge>
+                  </div>
+                  <div className="flex items-center text-sm text-muted-foreground mb-1">
+                    <CalendarIcon className="h-3 w-3 mr-1" />
+                    {format(post.date, "MMM d, yyyy")} at {post.time}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Badge
+                      className={platformColors[post.platform]}
+                      variant="outline"
+                    >
+                      {platformIcons[post.platform]} {post.platform}
+                    </Badge>
+                    {post.type && (
+                      <Badge variant="outline" className="bg-gray-100">
+                        {postTypeIcons[
+                          post.type as keyof typeof postTypeIcons
+                        ] || "📄"}{" "}
+                        {post.type}
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="flex-shrink-0"
+                  onClick={() => onEditPost(post.id)}
+                >
+                  Edit
+                </Button>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No posts match your filters</p>
+            <Button
+              variant="outline"
+              size="sm"
+              className="mt-2"
+              onClick={onCreatePost}
+            >
+              <Plus className="h-4 w-4 mr-2" /> Create New Post
+            </Button>
+          </div>
+        )}
+      </div>
     );
   };
 
   return (
-    <div className="space-y-4 bg-white p-6 rounded-lg border border-gray-200">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold">Content Calendar</h1>
-          <p className="text-muted-foreground">
-            Plan and schedule your social media content
-          </p>
-        </div>
-        <Button onClick={onCreatePost}>
-          <Plus className="mr-2 h-4 w-4" /> Create Post
-        </Button>
-      </div>
-
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-2">
+    <div className="space-y-4 bg-white p-4 md:p-6 rounded-lg border border-gray-200 overflow-x-auto">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div className="flex flex-wrap items-center gap-2">
           <Button variant="outline" size="sm" onClick={navigatePrevious}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -219,9 +518,9 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
           <Select value={platformFilter} onValueChange={setPlatformFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-full md:w-[180px]">
               <SelectValue placeholder="Filter by platform" />
             </SelectTrigger>
             <SelectContent>
@@ -234,8 +533,8 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
           </Select>
 
           <Select
-            value={view}
-            onValueChange={(v) => setView(v as "week" | "month")}
+            value={calendarView}
+            onValueChange={(v) => setCalendarView(v as "week" | "month")}
           >
             <SelectTrigger className="w-[120px]">
               <SelectValue placeholder="View" />
@@ -245,94 +544,27 @@ const ContentCalendar: React.FC<ContentCalendarProps> = ({
               <SelectItem value="month">Month</SelectItem>
             </SelectContent>
           </Select>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm">
+                <CalendarIcon className="h-4 w-4 mr-2" /> Jump to Date
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="end">
+              <Calendar
+                mode="single"
+                selected={currentDate}
+                onSelect={(date) => date && setCurrentDate(date)}
+                initialFocus
+              />
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 gap-4">
-        {weekDays.map((day) => (
-          <div key={day.toString()} className="text-center">
-            <div className="font-medium mb-1">{format(day, "EEE")}</div>
-            <div
-              className={cn(
-                "rounded-full w-8 h-8 flex items-center justify-center mx-auto",
-                isToday(day)
-                  ? "bg-primary text-primary-foreground"
-                  : "text-gray-600",
-              )}
-            >
-              {format(day, "d")}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="grid grid-cols-7 gap-4">
-        {weekDays.map((day) => {
-          const dayPosts = getPostsForDay(day);
-
-          return (
-            <div
-              key={day.toString()}
-              className={cn(
-                "min-h-[200px] border rounded-lg p-2",
-                isToday(day)
-                  ? "border-primary/50 bg-primary/5"
-                  : "border-gray-200",
-              )}
-            >
-              {dayPosts.length > 0 ? (
-                <div className="space-y-2">
-                  {dayPosts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="p-2 rounded-md border bg-white cursor-pointer hover:shadow-sm transition-shadow"
-                      onClick={() => onEditPost(post.id)}
-                    >
-                      <div className="flex justify-between items-start mb-1">
-                        <Badge
-                          className={platformColors[post.platform]}
-                          variant="outline"
-                        >
-                          {platformIcons[post.platform]} {post.platform}
-                        </Badge>
-                        <Badge
-                          className={statusColors[post.status]}
-                          variant="outline"
-                        >
-                          {post.status}
-                        </Badge>
-                      </div>
-                      <div className="font-medium text-sm truncate">
-                        {post.title}
-                      </div>
-                      <div className="text-xs text-gray-500">{post.time}</div>
-                      {post.image && (
-                        <div className="mt-1 h-12 rounded overflow-hidden">
-                          <img
-                            src={post.image}
-                            alt={post.title}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="h-full flex items-center justify-center">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-xs text-muted-foreground"
-                    onClick={onCreatePost}
-                  >
-                    <Plus className="h-3 w-3 mr-1" /> Add
-                  </Button>
-                </div>
-              )}
-            </div>
-          );
-        })}
+      <div className="min-w-[700px] overflow-x-auto">
+        {view === "grid" ? renderCalendarGrid() : renderCalendarList()}
       </div>
     </div>
   );

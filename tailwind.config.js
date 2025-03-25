@@ -2,10 +2,10 @@
 module.exports = {
   darkMode: ["class"],
   content: [
-    './pages/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   prefix: "",
   theme: {
@@ -17,6 +17,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["Google Sans", "Roboto", "sans-serif"],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -51,11 +54,100 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        google: {
+          blue: "#4285F4",
+          red: "#EA4335",
+          yellow: "#FBBC05",
+          green: "#34A853",
+          gray: "#F8F9FA",
+          "gray-dark": "#202124",
+          "gray-medium": "#5F6368",
+          "gray-light": "#E8EAED",
+          "dark-bg": "#1e1e1e",
+          "dark-card": "#2d2d2d",
+          "dark-border": "#3c3c3c",
+        },
+      },
+      backgroundImage: {
+        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+        "gradient-text":
+          "linear-gradient(to right, #4285F4, #EA4335, #FBBC05, #34A853)",
+        "gradient-blue-purple": "linear-gradient(to right, #4285F4, #8c52ff)",
+      },
+      typography: {
+        DEFAULT: {
+          css: {
+            maxWidth: "65ch",
+            color: "hsl(var(--foreground))",
+            '[class~="lead"]': {
+              color: "hsl(var(--foreground))",
+            },
+            a: {
+              color: "hsl(var(--primary))",
+            },
+            strong: {
+              color: "hsl(var(--foreground))",
+            },
+            "ol > li::marker": {
+              color: "hsl(var(--foreground))",
+            },
+            "ul > li::marker": {
+              color: "hsl(var(--foreground))",
+            },
+            hr: {
+              borderColor: "hsl(var(--border))",
+            },
+            blockquote: {
+              color: "hsl(var(--foreground))",
+              borderLeftColor: "hsl(var(--border))",
+            },
+            h1: {
+              color: "hsl(var(--foreground))",
+            },
+            h2: {
+              color: "hsl(var(--foreground))",
+            },
+            h3: {
+              color: "hsl(var(--foreground))",
+            },
+            h4: {
+              color: "hsl(var(--foreground))",
+            },
+            "figure figcaption": {
+              color: "hsl(var(--muted-foreground))",
+            },
+            code: {
+              color: "hsl(var(--foreground))",
+            },
+            "a code": {
+              color: "hsl(var(--primary))",
+            },
+            pre: {
+              color: "hsl(var(--foreground))",
+              backgroundColor: "hsl(var(--muted))",
+            },
+            thead: {
+              color: "hsl(var(--foreground))",
+              borderBottomColor: "hsl(var(--border))",
+            },
+            "tbody tr": {
+              borderBottomColor: "hsl(var(--border))",
+            },
+          },
+        },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "8px",
+        md: "6px",
+        sm: "4px",
+      },
+      boxShadow: {
+        google:
+          "0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15)",
+        "google-sm":
+          "0 1px 2px 0 rgba(60, 64, 67, 0.3), 0 1px 3px 1px rgba(60, 64, 67, 0.15)",
+        "google-lg":
+          "0 2px 6px 2px rgba(60, 64, 67, 0.15), 0 1px 2px 0 rgba(60, 64, 67, 0.3)",
       },
       keyframes: {
         "accordion-down": {
@@ -74,4 +166,4 @@ module.exports = {
     },
   },
   plugins: [require("tailwindcss-animate")],
-}
+};

@@ -1,14 +1,26 @@
-import React from "react";
+import React, { useState } from "react";
 import { Suspense } from "react";
 import DashboardSummary from "./dashboard/DashboardSummary";
 import UpcomingPosts from "./dashboard/UpcomingPosts";
 import PendingApprovals from "./dashboard/PendingApprovals";
 import QuickActions from "./dashboard/QuickActions";
-import { Bell, Settings, Search, User } from "lucide-react";
+import {
+  Bell,
+  Settings,
+  Search,
+  User,
+  Home as HomeIcon,
+  Calendar,
+  Sparkles,
+  CheckSquare,
+  BarChart3,
+  LogOut,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { cn } from "@/lib/utils";
+import { Link, useLocation } from "react-router-dom";
 
 interface SidebarLinkProps {
   icon: React.ReactNode;
@@ -26,19 +38,26 @@ const SidebarLink: React.FC<SidebarLinkProps> = ({
   onClick,
 }) => {
   return (
-    <a
-      href={href}
+    <Link
+      to={href}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-md transition-colors",
+        "flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-full transition-colors",
         active
-          ? "bg-primary/10 text-primary"
-          : "text-gray-600 hover:bg-gray-100",
+          ? "bg-primary/20 text-primary"
+          : "text-foreground/70 hover:bg-card hover:text-foreground",
       )}
     >
-      <div className="text-current">{icon}</div>
+      <div
+        className={cn(
+          "text-current",
+          active ? "text-primary" : "text-foreground/70",
+        )}
+      >
+        {icon}
+      </div>
       <span>{label}</span>
-    </a>
+    </Link>
   );
 };
 
@@ -51,39 +70,45 @@ const Sidebar: React.FC<SidebarProps> = ({ activeLink = "dashboard" }) => {
     {
       id: "dashboard",
       label: "Dashboard",
-      icon: <div className="w-5 h-5">🏠</div>,
+      icon: <HomeIcon className="w-5 h-5" />,
+      path: "/",
     },
     {
       id: "calendar",
       label: "Content Calendar",
-      icon: <div className="w-5 h-5">📅</div>,
+      icon: <Calendar className="w-5 h-5" />,
+      path: "/calendar",
     },
     {
       id: "generator",
       label: "AI Content Generator",
-      icon: <div className="w-5 h-5">✨</div>,
+      icon: <Sparkles className="w-5 h-5" />,
+      path: "/generator",
     },
     {
       id: "approvals",
       label: "Approval Workflow",
-      icon: <div className="w-5 h-5">✓</div>,
+      icon: <CheckSquare className="w-5 h-5" />,
+      path: "/approvals",
     },
     {
       id: "analytics",
       label: "Analytics",
-      icon: <div className="w-5 h-5">📊</div>,
+      icon: <BarChart3 className="w-5 h-5" />,
+      path: "/analytics",
     },
     {
       id: "settings",
       label: "Settings",
-      icon: <div className="w-5 h-5">⚙️</div>,
+      icon: <Settings className="w-5 h-5" />,
+      path: "/settings",
     },
   ];
 
   return (
-    <div className="w-64 h-full bg-white border-r border-gray-200 flex flex-col">
+    <div className="w-64 h-full bg-card border-r border-border flex flex-col">
       <div className="p-6">
-        <h1 className="text-xl font-bold text-primary">BG Social Express</h1>
+        <h1 className="text-xl font-bold gradient-text">BG Social Express</h1>
       </div>
       <div className="flex-1 px-3 py-2">
         <nav className="space-y-1">
@@ -93,20 +118,22 @@ const Sidebar: React.FC<SidebarProps> = ({ activeLink = "dashboard" }) => {
               icon={link.icon}
               label={link.label}
               active={activeLink === link.id}
-              href={`#${link.id}`}
+              href={link.path}
             />
           ))}
         </nav>
       </div>
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3">
-          <Avatar className="h-8 w-8">
-            <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=hotel-manager" />
+          <Avatar className="h-8 w-8 ring-2 ring-primary/20">
+            <AvatarImage src="https://i.pravatar.cc/150?img=32" />
             <AvatarFallback>HM</AvatarFallback>
           </Avatar>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium truncate">Hotel Manager</p>
-            <p className="text-xs text-gray-500 truncate">manager@hotel.com</p>
+            <p className="text-xs text-muted-foreground truncate">
+              manager@hotel.com
+            </p>
           </div>
         </div>
       </div>
@@ -119,36 +146,45 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onSearch = () => {} }) => {
+  const [searchValue, setSearchValue] = useState("");
+
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const query = formData.get("search") as string;
-    onSearch(query);
+    onSearch(searchValue);
   };
 
   return (
-    <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+    <header className="h-16 bg-card/50 backdrop-blur-sm border-b border-border flex items-center justify-between px-6">
       <form onSubmit={handleSearch} className="w-1/3">
         <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground/50" />
           <Input
             type="search"
             name="search"
             placeholder="Search..."
-            className="w-full pl-9 h-9"
+            value={searchValue}
+            onChange={(e) => setSearchValue(e.target.value)}
+            className="w-full pl-10 h-10 rounded-full bg-background/50 border-border focus:border-primary"
           />
         </div>
       </form>
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" className="text-gray-500">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-foreground/70 hover:text-foreground rounded-full"
+        >
           <Bell size={20} />
         </Button>
-        <Button variant="ghost" size="icon" className="text-gray-500">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="text-foreground/70 hover:text-foreground rounded-full"
+        >
           <Settings size={20} />
         </Button>
-        <Avatar className="h-8 w-8">
-          <AvatarImage src="https://api.dicebear.com/7.x/avataaars/svg?seed=user" />
+        <Avatar className="h-9 w-9 ring-2 ring-primary/20">
+          <AvatarImage src="https://i.pravatar.cc/150?img=12" />
           <AvatarFallback>U</AvatarFallback>
         </Avatar>
       </div>
@@ -163,9 +199,21 @@ interface DashboardLayoutProps {
 const DashboardLayout: React.FC<DashboardLayoutProps> = ({
   children = null,
 }) => {
+  const location = useLocation();
+  const currentPath = location.pathname;
+
+  // Determine active link based on current path
+  let activeLink = "dashboard";
+  if (currentPath === "/") activeLink = "dashboard";
+  else if (currentPath.includes("/calendar")) activeLink = "calendar";
+  else if (currentPath.includes("/generator")) activeLink = "generator";
+  else if (currentPath.includes("/approvals")) activeLink = "approvals";
+  else if (currentPath.includes("/analytics")) activeLink = "analytics";
+  else if (currentPath.includes("/settings")) activeLink = "settings";
+
   return (
-    <div className="flex h-screen bg-gray-50">
-      <Sidebar />
+    <div className="flex h-screen bg-background">
+      <Sidebar activeLink={activeLink} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
         <main className="flex-1 overflow-y-auto p-6">{children}</main>
@@ -178,9 +226,11 @@ const Home: React.FC = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+          <h1 className="text-2xl font-bold">Dashboard</h1>
+          <QuickActions />
+        </div>
         <DashboardSummary />
-        <QuickActions />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <UpcomingPosts />

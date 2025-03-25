@@ -9,6 +9,7 @@ import {
   BarChart3,
   Settings,
   LogOut,
+  HelpCircle,
 } from "lucide-react";
 
 interface SidebarItemProps {
@@ -28,13 +29,20 @@ const SidebarItem = ({
     <Link
       to={href}
       className={cn(
-        "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+        "flex items-center gap-3 px-4 py-3 rounded-full transition-colors",
         active
-          ? "bg-primary/10 text-primary font-medium"
-          : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+          ? "bg-primary/20 text-primary font-medium"
+          : "text-foreground/70 hover:bg-card hover:text-foreground",
       )}
     >
-      <div className="w-5 h-5">{icon}</div>
+      <div
+        className={cn(
+          "w-5 h-5",
+          active ? "text-primary" : "text-foreground/70",
+        )}
+      >
+        {icon}
+      </div>
       <span>{label}</span>
     </Link>
   );
@@ -79,12 +87,19 @@ const Sidebar = ({ activePath }: SidebarProps) => {
       label: "Settings",
       href: "/settings",
     },
+    {
+      icon: <HelpCircle className="w-5 h-5" />,
+      label: "Help Center",
+      href: "/help",
+    },
   ];
 
   return (
-    <div className="w-[280px] h-full bg-background border-r flex flex-col">
+    <div className="w-[280px] h-full bg-card border-r border-border flex flex-col">
       <div className="p-6">
-        <h2 className="text-2xl font-bold text-primary">BG Social Express</h2>
+        <h2 className="text-2xl font-medium gradient-text">
+          BG Social Express
+        </h2>
         <p className="text-sm text-muted-foreground mt-1">
           Hospitality Social Suite
         </p>
@@ -102,8 +117,8 @@ const Sidebar = ({ activePath }: SidebarProps) => {
         ))}
       </nav>
 
-      <div className="p-4 border-t">
-        <button className="flex items-center gap-3 px-4 py-3 w-full rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors">
+      <div className="p-4 border-t border-border">
+        <button className="flex items-center gap-3 px-4 py-3 w-full rounded-full text-foreground/70 hover:bg-card hover:text-foreground transition-colors">
           <LogOut className="w-5 h-5" />
           <span>Logout</span>
         </button>
